@@ -1,31 +1,34 @@
 import { Requester, RequesterScores } from '../types';
 import { calculateAverageScore } from './turkopticon';
 
-interface BadgeData {
-  status?: Status;
-  progress?: Progress;
-  text: string;
+type Status = 'success' | 'info' | 'attention' | 'warning';
+
+interface BadgeDescriptor {
+  status: Status;
+  content: string;
 }
 
-type Status = 'success' | 'info' | 'attention' | 'warning';
-type Progress = 'incomplete' | 'partiallyComplete' | 'complete';
+export const generateBadges = (
+  requester: Requester | undefined
+): BadgeDescriptor[] => {
+  if (!requester) {
+    return [];
+  }
 
-export const calculateAllBadges = (requester: Requester): BadgeData[] => {
-  const tentativeBadges: (BadgeData | null)[] = [
+  const allBadges: (BadgeDescriptor | null)[] = [
     calculateScoreBadge(requester.attrs),
     calculateReviewsBadge(requester.reviews)
   ];
 
-  return tentativeBadges.filter(el => el !== null).slice(0, 3) as BadgeData[];
+  return allBadges.filter(el => el !== null).slice(0, 3) as BadgeDescriptor[];
 };
 
-const calculateScoreBadge = (scores: RequesterScores): BadgeData => {
-  const average = parseFloat(calculateAverageScore(scores));
-  const status = assignScoreColor(average);
-  const text = assignScoreText(status);
+const calculateScoreBadge = (scores: RequesterScores): BadgeDescriptor => {
+  const average = calculateAverageScore(scores);
+  const status = assignScoreColor(parseFloat(average));
   return {
     status,
-    text
+    content: `${average} T.O.`
   };
 };
 
@@ -41,25 +44,10 @@ const assignScoreColor = (score: number): Status => {
   }
 };
 
-const assignScoreText = (status: Status): string => {
-  switch (status) {
-    case 'warning':
-      return 'Low T.O.';
-    case 'attention':
-      return 'OK T.O.';
-    case 'info':
-      return 'Good T.O.';
-    case 'success':
-      return 'Great T.O.';
-    default:
-      return 'Invalid average T.O.';
-  }
-};
-
-const calculateReviewsBadge = (reviews: number): BadgeData | null => {
-  const lowReviewsBadge: BadgeData = {
-    text: 'Few reviews',
-    progress: 'incomplete'
+const calculateReviewsBadge = (reviews: number): BadgeDescriptor | null => {
+  const lowReviewsBadge: BadgeDescriptor = {
+    content: 'Few reviews',
+    status: 'attention'
   };
 
   return reviews < 4 ? lowReviewsBadge : null;
