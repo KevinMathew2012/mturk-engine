@@ -34,6 +34,7 @@ import databaseFilterSettings from './reducers/databaseFilterSettings';
 import loggedRequesters from './reducers/loggedRequesters';
 import markedAsReadGroupIds from './reducers/markedAsReadGroupIds';
 import hitBlocklistFilterSettings from './reducers/hitBlocklistFilterSettings';
+import searchResultsLog from './reducers/searchResultsLog';
 
 export const rootReducer = combineReducers<RootState>({
   tab,
@@ -53,6 +54,7 @@ export const rootReducer = combineReducers<RootState>({
   waitingForMturk,
   searchingActive,
   topticonSettings,
+  searchResultsLog,
   loggedRequesters,
   watcherStatistics,
   dailyEarningsGoal,

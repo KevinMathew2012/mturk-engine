@@ -57,7 +57,11 @@ export const readUploadedFileAsText = (
     };
 
     temporaryFileReader.onload = () => {
-      resolve(temporaryFileReader.result);
+      if (typeof temporaryFileReader.result === 'string') {
+        resolve(temporaryFileReader.result as string);
+      }
+
+      reject(new DOMException('Parsed result was not a string.'));
     };
     temporaryFileReader.readAsText(settingsFile);
   });
